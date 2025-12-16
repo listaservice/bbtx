@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FUNCTIONARE SAAS - BETIX Multi-Tenant Bot</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+      }
+
+      header h1 {
+        font-size: 3em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      header p {
+        font-size: 1.2em;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .section {
+        margin-bottom: 50px;
+        padding: 30px;
+        background: #f8f9fa;
+        border-radius: 15px;
+        border-left: 5px solid #667eea;
+      }
+
+      .section h2 {
+        color: #667eea;
+        font-size: 2em;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+      }
+
+      .section h3 {
+        color: #764ba2;
+        font-size: 1.5em;
+        margin: 25px 0 15px 0;
+        padding-left: 20px;
+        border-left: 3px solid #764ba2;
+      }
+
+      .section h4 {
+        color: #555;
+        font-size: 1.2em;
+        margin: 20px 0 10px 0;
+        font-weight: 600;
+      }
+
+      .emoji {
+        font-size: 1.2em;
+        margin-right: 10px;
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #68d391;
+        padding: 20px;
+        border-radius: 10px;
+        overflow-x: auto;
+        margin: 15px 0;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        line-height: 1.5;
+      }
+
+      .table-container {
+        overflow-x: auto;
+        margin: 20px 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      th {
+        background: #667eea;
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+      }
+
+      td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      tr:hover {
+        background: #f7fafc;
+      }
+
+      .step {
+        background: white;
+        padding: 20px;
+        margin: 15px 0;
+        border-radius: 10px;
+        border-left: 4px solid #48bb78;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .step-number {
+        display: inline-block;
+        background: #48bb78;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 30px;
+        font-weight: bold;
+        margin-right: 10px;
+      }
+
+      .arrow {
+        text-align: center;
+        color: #667eea;
+        font-size: 2em;
+        margin: 10px 0;
+      }
+
+      .success {
+        color: #48bb78;
+        font-weight: bold;
+      }
+
+      .error {
+        color: #f56565;
+        font-weight: bold;
+      }
+
+      .warning {
+        color: #ed8936;
+        font-weight: bold;
+      }
+
+      .info {
+        background: #ebf8ff;
+        border-left: 4px solid #4299e1;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 5px;
+      }
+
+      ul,
+      ol {
+        margin-left: 30px;
+        margin-top: 10px;
+      }
+
+      li {
+        margin: 8px 0;
+      }
+
+      .highlight {
+        background: #fef5e7;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-weight: 600;
+      }
+
+      footer {
+        background: #2d3748;
+        color: white;
+        text-align: center;
+        padding: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🚀 FUNCTIONARE SAAS - BETIX</h1>
+        <p>Documentație Completă Multi-Tenant Bot System</p>
+        <p style="font-size: 0.9em; margin-top: 10px">
+          Data: 30 Noiembrie 2025 | Versiune: 1.0
+        </p>
+      </header>
+
+      <div class="content">
+        <!-- ARHITECTURA GENERALĂ -->
+        <div class="section">
+          <h2><span class="emoji">🏗️</span>ARHITECTURA GENERALĂ</h2>
+
+          <h3>Componente Principale</h3>
+          <ul>
+            <li><strong>Frontend:</strong> Vue 3 + Vite + TailwindCSS</li>
+            <li><strong>Backend:</strong> FastAPI + Python 3.8+</li>
+            <li>
+              <strong>Database:</strong> PostgreSQL (users, teams,
+              betfair_credentials)
+            </li>
+            <li>
+              <strong>Storage:</strong> Google Sheets (meciuri, statistici,
+              strategii)
+            </li>
+            <li>
+              <strong>API Extern:</strong> Betfair API (pariuri, odds,
+              rezultate)
+            </li>
+          </ul>
+
+          <h3>Principii Multi-Tenant</h3>
+          <div class="info">
+            <strong>🔒 Izolare Completă Per User:</strong>
+            <ul>
+              <li>
+                Fiecare user are propriile credentials Betfair (encrypted în
+                database)
+              </li>
+              <li>
+                Fiecare user are propriul Google Sheets (spreadsheet_id unic)
+              </li>
+              <li>
+                Fiecare user vede doar teams-urile lui (filter by user_id)
+              </li>
+              <li>
+                Bot-ul rulează SEPARAT pentru fiecare user (staggered execution)
+              </li>
+            </ul>
+          </div>
+
+          <h3>Planuri de Abonament</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Plan</th>
+                  <th>Preț</th>
+                  <th>Max Teams</th>
+                  <th>Trial</th>
+                  <th>Durată</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Demo</strong></td>
+                  <td>Gratuit</td>
+                  <td>5</td>
+                  <td>3 zile</td>
+                  <td>Trial</td>
+                </tr>
+                <tr>
+                  <td><strong>Simplu</strong></td>
+                  <td>49 €/lună</td>
+                  <td>5</td>
+                  <td>-</td>
+                  <td>30 zile</td>
+                </tr>
+                <tr>
+                  <td><strong>Comun</strong></td>
+                  <td>75 €/lună</td>
+                  <td>10</td>
+                  <td>-</td>
+                  <td>30 zile</td>
+                </tr>
+                <tr>
+                  <td><strong>Extrem</strong></td>
+                  <td>150 €/lună</td>
+                  <td>25</td>
+                  <td>-</td>
+                  <td>30 zile</td>
+                </tr>
+                <tr>
+                  <td><strong>Premium</strong></td>
+                  <td>250 €/lună</td>
+                  <td>∞ (Nelimitat)</td>
+                  <td>-</td>
+                  <td>30 zile</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- FLUXUL COMPLET USER -->
+        <div class="section">
+          <h2><span class="emoji">👤</span>FLUXUL COMPLET AL USER-ULUI</h2>
+
+          <h3>ZIUA 1: Înregistrare și Configurare</h3>
+
+          <div class="step">
+            <h4><span class="step-number">1</span>Înregistrare User</h4>
+            <div class="code-block">
+              User: john@example.com ↓ POST /api/auth/register - email:
+              john@example.com - password: *** - full_name: John Doe ↓ Backend
+              creează în DATABASE: - user_id: uuid-john - subscription_plan:
+              demo - subscription_status: trial - subscription_ends_at: NOW() +
+              3 days - max_teams: 5 - google_sheets_id: NULL (încă)
+            </div>
+          </div>
+
+          <div class="arrow">↓</div>
+
+          <div class="step">
+            <h4><span class="step-number">2</span>Login → Dashboard</h4>
+            <div class="code-block">
+              User login ↓ Dashboard afișează: ✅ Subscription Banner: "Trial -
+              3 zile rămase" ⚠️ Betfair Setup Prompt: "Configurare necesară"
+            </div>
+          </div>
+
+          <div class="arrow">↓</div>
+
+          <div class="step">
+            <h4>
+              <span class="step-number">3</span>Betfair Setup Wizard (30
+              secunde)
+            </h4>
+            <div class="code-block">
+              User click "Configurează Acum" ↓
+              <strong>Step 1: Credențiale Betfair</strong>
+              - Username: john_betfair - Password: *** - Click "Verifică" ✅ ↓
+              <strong>Step 2: App Key</strong>
+              - User urmează instrucțiunile - Generează App Key pe Betfair -
+              Introduce: wKqS7N8xK9xK7N8x - Click "Finalizează Setup" ✅ ↓
+              Backend salvează ENCRYPTED în DATABASE: - betfair_credentials
+              table: - user_id: uuid-john - username:
+              <span class="success">encrypt("john_betfair")</span> - password:
+              <span class="success">encrypt("***")</span> - app_key:
+              <span class="success">encrypt("wKqS7N8xK9xK7N8x")</span>
+            </div>
+          </div>
+
+          <div class="arrow">↓</div>
+
+          <div class="step">
+            <h4><span class="step-number">4</span>User Adaugă Prima Echipă</h4>
+            <div class="code-block">
+              User: Dashboard → Meniu "Echipe" → "Adaugă Echipă" ↓ User caută:
+              "Liverpool" ↓ Frontend: GET /api/teams/search-betfair?q=Liverpool
+              ↓ Backend: - Connect to Betfair API (cu credentials john) - Caută
+              echipe: list_events(text_query="Liverpool") - Returnează:
+              ["Liverpool FC", "Liverpool U21", ...] ↓ User selectează:
+              "Liverpool FC" - Sport: Football - League: Premier League -
+              Country: England ↓ User click "Adaugă" ✅
+            </div>
+          </div>
+        </div>
+
+        <!-- BACKEND PROCESARE ECHIPĂ -->
+        <div class="section">
+          <h2><span class="emoji">⚙️</span>BACKEND PROCESEAZĂ ECHIPA</h2>
+
+          <div class="step">
+            <h4>
+              <span class="step-number">5</span>POST /api/teams - Procesare
+              Completă
+            </h4>
+
+            <h4 style="margin-top: 20px">1️⃣ Validări</h4>
+            <div class="code-block">
+              ✅ Verifică subscription_status: "trial" ✅ Verifică max_teams:
+              0/5 (OK!)
+            </div>
+
+            <h4 style="margin-top: 20px">
+              2️⃣ Creează Google Sheets (dacă nu există)
+            </h4>
+            <div class="code-block">
+              Spreadsheet: "john@example.com_teams" ↓ Sheet "Index" cu headers:
+              | ID | Name | Sport | Status | Cumulative Loss | Last Stake |
+              Progression Step | Initial Stake | ↓ Salvează spreadsheet_id în
+              user.google_sheets_id
+            </div>
+
+            <h4 style="margin-top: 20px">3️⃣ Salvează în DATABASE</h4>
+            <div class="code-block">
+              INSERT INTO teams: - id: uuid-liverpool - user_id: uuid-john -
+              name: Liverpool FC - sport: football - status: active
+
+              <span class="warning"
+                >NOTĂ: cumulative_loss și progression_step NU se folosesc din
+                database!</span
+              >
+              <span class="success"
+                >Se citesc DOAR din Google Sheets Index!</span
+              >
+            </div>
+
+            <h4 style="margin-top: 20px">4️⃣ Salvează în GOOGLE SHEETS Index</h4>
+            <div class="table-container">
+              <table>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Sport</th>
+                  <th>Status</th>
+                  <th>Cumulative Loss</th>
+                  <th>Last Stake</th>
+                  <th>Progression Step</th>
+                  <th>Initial Stake</th>
+                </tr>
+                <tr>
+                  <td>uuid-liverpool</td>
+                  <td>Liverpool FC</td>
+                  <td>football</td>
+                  <td>active</td>
+                  <td>0</td>
+                  <td>100</td>
+                  <td>0</td>
+                  <td>100</td>
+                </tr>
+              </table>
+            </div>
+
+            <h4 style="margin-top: 20px">5️⃣ Creează Sheet "Liverpool FC"</h4>
+            <div class="code-block">
+              Headers: | Data | Meci | Competiție | Cotă | Miză | Status |
+              Profit/Loss | Bet ID |
+            </div>
+
+            <h4 style="margin-top: 20px">
+              6️⃣ Caută Următoarele 20 Meciuri pe Betfair
+            </h4>
+            <div class="code-block">
+              Connect to Betfair API (cu credentials john) ↓
+              list_events(event_type_id="1", text_query="Liverpool FC") ↓ Pentru
+              fiecare meci (max 20): - Get market_catalogue pentru event details
+              - Get market_book pentru odds exacte - Extract: data, nume meci,
+              competiție, cotă
+            </div>
+
+            <h4 style="margin-top: 20px">
+              7️⃣ Scrie TOATE Meciurile în Google Sheets
+            </h4>
+            <div class="table-container">
+              <table>
+                <tr>
+                  <th>Data</th>
+                  <th>Meci</th>
+                  <th>Competiție</th>
+                  <th>Cotă</th>
+                  <th>Miză</th>
+                  <th>Status</th>
+                  <th>Profit/Loss</th>
+                  <th>Bet ID</th>
+                </tr>
+                <tr>
+                  <td>2025-12-01</td>
+                  <td>Liverpool vs Arsenal</td>
+                  <td>Premier League</td>
+                  <td>1.85</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>2025-12-05</td>
+                  <td>Chelsea vs Liverpool</td>
+                  <td>Premier League</td>
+                  <td>2.10</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>2025-12-10</td>
+                  <td>Liverpool vs Man City</td>
+                  <td>Premier League</td>
+                  <td>1.95</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td colspan="8" style="text-align: center">
+                    ... (până la 20 meciuri)
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="info" style="margin-top: 20px">
+              <strong>✅ User vede: "Echipă adăugată cu succes!"</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOT AUTOMAT -->
+        <div class="section">
+          <h2><span class="emoji">🤖</span>BOT RULEAZĂ AUTOMAT</h2>
+
+          <h3>ZIUA 2: Scheduler Multi-User (13:00)</h3>
+
+          <div class="step">
+            <h4><span class="step-number">6</span>Cron Job Pornește</h4>
+            <div class="code-block">
+              Cron Job (13:00): ↓ multi_user_scheduler.run_for_all_users() ↓
+              <strong>1. Query useri activi din DATABASE:</strong>
+
+              SELECT * FROM users WHERE is_active = true AND subscription_status
+              IN ('active', 'trial') AND subscription_ends_at > NOW() AND EXISTS
+              ( SELECT 1 FROM betfair_credentials WHERE user_id = users.id ) AND
+              EXISTS ( SELECT 1 FROM teams WHERE user_id = users.id AND status =
+              'active' ) Rezultat: [john@example.com, maria@example.com, ...] ↓
+              <strong>2. Loop prin fiecare user (staggered execution):</strong>
+              - Pentru john@example.com - DELAY 30 secunde - Pentru
+              maria@example.com - DELAY 30 secunde - ...
+            </div>
+          </div>
+
+          <div class="arrow">↓</div>
+
+          <div class="step">
+            <h4>
+              <span class="step-number">7</span>UserBotService pentru John
+            </h4>
+
+            <h4 style="margin-top: 20px">Initialize:</h4>
+            <div class="code-block">
+              <strong>1. Load Betfair credentials din DATABASE:</strong>
+
+              SELECT username, password, app_key FROM betfair_credentials WHERE
+              user_id = 'uuid-john' ↓
+              <strong>Decrypt:</strong>
+              - username: "john_betfair" - password: "***" - app_key:
+              "wKqS7N8xK9xK7N8x" ↓
+              <strong>2. Connect to Betfair API</strong> (cu credentials john) ↓
+              <strong>3. Initialize Google Sheets:</strong>
+              - spreadsheet_id: john's spreadsheet ↓
+              <strong>4. Load teams din DATABASE:</strong>
+
+              SELECT * FROM teams WHERE user_id = 'uuid-john' AND status =
+              'active' Rezultat: [Liverpool FC]
+            </div>
+          </div>
+
+          <div class="arrow">↓</div>
+
+          <div class="step">
+            <h4><span class="step-number">8</span>Procesează Liverpool FC</h4>
+
+            <h4 style="margin-top: 20px">1. Verifică PENDING</h4>
+            <div class="code-block">
+              Citește Sheet "Liverpool FC" Caută Status = "PENDING" Rezultat:
+              <span class="success">NU (OK!)</span>
+            </div>
+
+            <h4 style="margin-top: 20px">2. Citește Meciuri Programate</h4>
+            <div class="code-block">
+              Citește Sheet "Liverpool FC" Filtrează: Status = gol (fără status)
+              ↓ Rezultat: | Data | Meci | Cotă | Status |
+              |------------|-----------------------|------|--------| |
+              2025-12-01 | Liverpool vs Arsenal | 1.85 | | ← ✅ | 2025-12-05 |
+              Chelsea vs Liverpool | 2.10 | | | 2025-12-10 | Liverpool vs Man
+              City | 1.95 | |
+            </div>
+
+            <h4 style="margin-top: 20px">3. Sortează și Ia PRIMUL</h4>
+            <div class="code-block">
+              <span class="success">Match: "Liverpool vs Arsenal"</span>
+              <span class="success">Data: "2025-12-01"</span>
+              <span class="success">Cotă: 1.85</span>
+            </div>
+
+            <h4 style="margin-top: 20px">
+              4. Citește Team Data din Google Sheets Index
+            </h4>
+            <div class="table-container">
+              <table>
+                <tr>
+                  <th>Name</th>
+                  <th>Cumulative Loss</th>
+                  <th>Progression Step</th>
+                  <th>Initial Stake</th>
+                </tr>
+                <tr>
+                  <td>Liverpool FC</td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>100</td>
+                </tr>
+              </table>
+            </div>
+
+            <h4 style="margin-top: 20px">5. Calculează Miză Martingale</h4>
+            <div class="code-block">
+              <strong>Formula:</strong>
+              stake = (cumulative_loss / (odds - 1)) + initial_stake
+
+              <strong>Calcul:</strong>
+              stake = (0 / (1.85 - 1)) + 100 stake = (0 / 0.85) + 100 stake = 0
+              + 100 stake = <span class="success">100 RON</span>
+
+              <span class="info"
+                >(cumulative_loss = 0, deci e primul pariu)</span
+              >
+            </div>
+
+            <h4 style="margin-top: 20px">
+              6. Găsește Meciul pe Betfair (by date + name)
+            </h4>
+            <div class="code-block">
+              list_events(text_query="Liverpool") ↓ Filtrează: - data =
+              "2025-12-01" ȘI - name conține "Liverpool" ↓
+              <span class="success">Găsit: event_id = "32547891"</span>
+            </div>
+
+            <h4 style="margin-top: 20px">7. Get Market și Selection</h4>
+            <div class="code-block">
+              list_market_catalogue(event_ids=["32547891"]) ↓ market_id =
+              "1.234567" ↓ Găsește runner "Liverpool": selection_id = 123
+            </div>
+
+            <h4 style="margin-top: 20px">8. Plasează Pariu pe Betfair</h4>
+            <div class="code-block">
+              place_bet( market_id="1.234567", selection_id=123, stake=100,
+              odds=1.85 ) ↓
+              <span class="success"
+                >Betfair returnează: bet_id = "987654321"</span
+              >
+            </div>
+
+            <h4 style="margin-top: 20px">
+              9. UPDATE Google Sheets "Liverpool FC"
+            </h4>
+            <div class="table-container">
+              <table>
+                <tr>
+                  <th>Data</th>
+                  <th>Meci</th>
+                  <th>Cotă</th>
+                  <th>Miză</th>
+                  <th>Status</th>
+                  <th>Profit/Loss</th>
+                  <th>Bet ID</th>
+                </tr>
+                <tr style="background: #d4edda">
+                  <td>2025-12-01</td>
+                  <td>Liverpool vs Arsenal</td>
+                  <td>1.85</td>
+                  <td><strong>100</strong></td>
+                  <td><strong>PENDING</strong></td>
+                  <td>0</td>
+                  <td><strong>987654321</strong></td>
+                </tr>
+                <tr>
+                  <td>2025-12-05</td>
+                  <td>Chelsea vs Liverpool</td>
+                  <td>2.10</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </table>
+            </div>
+
+            <h4 style="margin-top: 20px">10. UPDATE Google Sheets Index</h4>
+            <div class="code-block">
+              UPDATE Index: - Last Stake = 100 ↓
+              <span class="success"
+                >✅ Logger: "Pariu plasat: Liverpool FC - Liverpool vs Arsenal -
+                100 RON @ 1.85"</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- VERIFICARE REZULTATE -->
+        <div class="section">
+          <h2>
+            <span class="emoji">🔍</span>VERIFICARE REZULTATE ȘI CONTINUARE
+            STRATEGIE
+          </h2>
+
+          <h3>ZIUA 3: Liverpool PIERDE</h3>
+
+          <div class="step">
+            <h4>
+              <span class="step-number">9</span>Bot Verifică Rezultate
+              (Periodic)
+            </h4>
+
+            <h4 style="margin-top: 20px">1. Citește Pariuri PENDING</h4>
+            <div class="code-block">
+              Citește toate sheet-urile echipelor Filtrează: Status = "PENDING"
+              ↓ Rezultat: | Team | Meci | Bet ID | Miză | Cotă |
+              |-------------|----------------------|-----------|------|------| |
+              Liverpool FC| Liverpool vs Arsenal | 987654321 | 100 | 1.85 |
+            </div>
+
+            <h4 style="margin-top: 20px">
+              2. Get Settled Orders de pe Betfair
+            </h4>
+            <div class="code-block">
+              get_settled_orders(days=3) ↓ Betfair returnează: [ { "betId":
+              "987654321", "profit": <span class="error">-100</span>, // ←
+              PIERDUT! "settledDate": "2025-12-01T18:00:00Z" } ]
+            </div>
+
+            <h4 style="margin-top: 20px">3. Match bet_id și Procesează</h4>
+            <div class="code-block">
+              bet_id: "987654321" găsit! ✅ profit = -100 →
+              <span class="error">LOST</span>
+              ↓
+              <strong>Citește team data din Google Sheets Index:</strong>
+              | Name | Cumulative Loss | Progression Step |
+              |-------------|-----------------|------------------| | Liverpool
+              FC| 0 | 0 | ↓
+              <strong>Procesează LOST:</strong>
+              staking_service.process_loss(stake=100, cumulative_loss=0, step=0)
+              ↓ Rezultat: - loss_amount = -100 - new_cumulative_loss = 0 + 100 =
+              <span class="error">100</span> - new_progression_step = 0 + 1 =
+              <span class="error">1</span>
+            </div>
+
+            <h4 style="margin-top: 20px">
+              4. UPDATE Google Sheets "Liverpool FC"
+            </h4>
+            <div class="table-container">
+              <table>
+                <tr>
+                  <th>Data</th>
+                  <th>Meci</th>
+                  <th>Cotă</th>
+                  <th>Miză</th>
+                  <th>Status</th>
+                  <th>Profit/Loss</th>
+                  <th>Bet ID</th>
+                </tr>
+                <tr style="background: #f8d7da">
+                  <td>2025-12-01</td>
+                  <td>Liverpool vs Arsenal</td>
+                  <td>1.85</td>
+                  <td>100</td>
+                  <td><strong class="error">LOST</strong></td>
+                  <td><strong class="error">-100</strong></td>
+                  <td>987654321</td>
+                </tr>
+                <tr>
+                  <td>2025-12-05</td>
+                  <td>Chelsea vs Liverpool</td>
+                  <td>2.10</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </table>
+            </div>
+
+            <h4 style="margin-top: 20px">5. UPDATE Google Sheets Index</h4>
+            <div class="table-container">
+              <table>
+                <tr>
+                  <th>Name</th>
+                  <th>Cumulative Loss</th>
+                  <th>Progression Step</th>
+                </tr>
+                <tr style="background: #f8d7da">
+                  <td>Liverpool FC</td>
+                  <td><strong class="error">100</strong></td>
+                  <td><strong class="error">1</strong></td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="code-block" style="margin-top: 20px">
+              <span class="error"
+                >❌ Logger: "LOST: Liverpool FC - Liverpool vs Arsenal - Loss:
+                -100 RON"</span
+              >
+            </div>
+          </div>
+
+          <div class="arrow">↓</div>
+
+          <h3>ZIUA 4: Bot Continuă Strategia (13:00)</h3>
+
+          <div class="step">
+            <h4>
+              <span class="step-number">10</span>Bot Rulează Din Nou -
+              Martingale în Acțiune
+            </h4>
+
+            <h4 style="margin-top: 20px">1. Verifică PENDING: NU ✅</h4>
+
+            <h4 style="margin-top: 20px">2. Citește Meciuri Programate</h4>
+            <div class="code-block">
+              | Data | Meci | Cotă | Status |
+              |------------|-----------------------|------|--------| |
+              2025-12-01 | Liverpool vs Arsenal | 1.85 | LOST | ← Skip (are
+              status) | 2025-12-05 | Chelsea vs Liverpool | 2.10 | | ← ✅ PRIMUL
+              fără status! | 2025-12-10 | Liverpool vs Man City | 1.95 | |
+            </div>
+
+            <h4 style="margin-top: 20px">3. Ia PRIMUL fără status</h4>
+            <div class="code-block">
+              <span class="success">Match: "Chelsea vs Liverpool"</span>
+              <span class="success">Data: "2025-12-05"</span>
+              <span class="success">Cotă: 2.10</span>
+            </div>
+
+            <h4 style="margin-top: 20px">
+              4. Citește Team Data din Google Sheets Index
+            </h4>
+            <div class="table-container">
+              <table>
+                <tr>
+                  <th>Name</th>
+                  <th>Cumulative Loss</th>
+                  <th>Progression Step</th>
+                  <th>Initial Stake</th>
+                </tr>
+                <tr style="background: #fff3cd">
+                  <td>Liverpool FC</td>
+                  <td><strong>100</strong></td>
+                  <td><strong>1</strong></td>
+                  <td>100</td>
+                </tr>
+              </table>
+            </div>
+
+            <h4 style="margin-top: 20px">
+              5. Calculează Miză Martingale (Strategia în Acțiune!)
+            </h4>
+            <div class="code-block">
+              <strong>Formula:</strong>
+              stake = (cumulative_loss / (odds - 1)) + initial_stake
+
+              <strong>Calcul:</strong>
+              stake = (100 / (2.10 - 1)) + 100 stake = (100 / 1.10) + 100 stake
+              = 90.91 + 100 stake = 190.91 ≈
+              <span class="warning">191 RON</span>
+
+              <span class="warning"
+                >⚠️ Miza crește pentru a recupera pierderea!</span
+              >
+            </div>
+
+            <h4 style="margin-top: 20px">
+              6-8. Găsește Meci, Plasează Pariu (la fel ca înainte)
+            </h4>
+
+            <h4 style="margin-top: 20px">
+              9. UPDATE Google Sheets "Liverpool FC"
+            </h4>
+            <div class="table-container">
+              <table>
+                <tr>
+                  <th>Data</th>
+                  <th>Meci</th>
+                  <th>Cotă</th>
+                  <th>Miză</th>
+                  <th>Status</th>
+                  <th>Profit/Loss</th>
+                  <th>Bet ID</th>
+                </tr>
+                <tr style="background: #f8d7da">
+                  <td>2025-12-01</td>
+                  <td>Liverpool vs Arsenal</td>
+                  <td>1.85</td>
+                  <td>100</td>
+                  <td>LOST</td>
+                  <td>-100</td>
+                  <td>987654321</td>
+                </tr>
+                <tr style="background: #d4edda">
+                  <td>2025-12-05</td>
+                  <td>Chelsea vs Liverpool</td>
+                  <td>2.10</td>
+                  <td><strong>191</strong></td>
+                  <td><strong>PENDING</strong></td>
+                  <td>0</td>
+                  <td><strong>111222333</strong></td>
+                </tr>
+                <tr>
+                  <td>2025-12-10</td>
+                  <td>Liverpool vs Man City</td>
+                  <td>1.95</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="code-block" style="margin-top: 20px">
+              <span class="success"
+                >✅ Logger: "Pariu plasat: Liverpool FC - Chelsea vs Liverpool -
+                191 RON @ 2.10"</span
+              >
+            </div>
+          </div>
+
+          <div class="arrow">↓</div>
+
+          <h3>ZIUA 5: Chelsea vs Liverpool → WON! 🎉</h3>
+
+          <div class="step">
+            <h4>
+              <span class="step-number">11</span>Bot Verifică Rezultate -
+              CÂȘTIG!
+            </h4>
+
+            <h4 style="margin-top: 20px">1. Citește PENDING</h4>
+            <div class="code-block">
+              "Chelsea vs Liverpool" (bet_id: 111222333)
+            </div>
+
+            <h4 style="margin-top: 20px">2. Get Settled Orders</h4>
+            <div class="code-block">
+              { "betId": "111222333", "profit":
+              <span class="success">+210</span>, // ← CÂȘTIGAT! "settledDate":
+              "2025-12-05T20:00:00Z" } ↓ profit = +210 →
+              <span class="success">WON ✅</span>
+            </div>
+
+            <h4 style="margin-top: 20px">3. Procesează WON</h4>
+            <div class="code-block">
+              staking_service.process_win(stake=191, odds=2.10) ↓ Rezultat: -
+              profit_amount = 191 * (2.10 - 1) = 191 * 1.10 =
+              <span class="success">+210 RON</span> - new_cumulative_loss =
+              <span class="success">0 (RESET!)</span> - new_progression_step =
+              <span class="success">0 (RESET!)</span>
+            </div>
+
+            <h4 style="margin-top: 20px">
+              4. UPDATE Google Sheets "Liverpool FC"
+            </h4>
+            <div class="table-container">
+              <table>
+                <tr>
+                  <th>Data</th>
+                  <th>Meci</th>
+                  <th>Cotă</th>
+                  <th>Miză</th>
+                  <th>Status</th>
+                  <th>Profit/Loss</th>
+                  <th>Bet ID</th>
+                </tr>
+                <tr style="background: #f8d7da">
+                  <td>2025-12-01</td>
+                  <td>Liverpool vs Arsenal</td>
+                  <td>1.85</td>
+                  <td>100</td>
+                  <td>LOST</td>
+                  <td>-100</td>
+                  <td>987654321</td>
+                </tr>
+                <tr style="background: #d4edda">
+                  <td>2025-12-05</td>
+                  <td>Chelsea vs Liverpool</td>
+                  <td>2.10</td>
+                  <td>191</td>
+                  <td><strong class="success">WON</strong></td>
+                  <td><strong class="success">+210</strong></td>
+                  <td>111222333</td>
+                </tr>
+                <tr>
+                  <td>2025-12-10</td>
+                  <td>Liverpool vs Man City</td>
+                  <td>1.95</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </table>
+            </div>
+
+            <h4 style="margin-top: 20px">
+              5. UPDATE Google Sheets Index (RESET!)
+            </h4>
+            <div class="table-container">
+              <table>
+                <tr>
+                  <th>Name</th>
+                  <th>Cumulative Loss</th>
+                  <th>Progression Step</th>
+                </tr>
+                <tr style="background: #d4edda">
+                  <td>Liverpool FC</td>
+                  <td><strong class="success">0</strong> ← RESET!</td>
+                  <td><strong class="success">0</strong> ← RESET!</td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="info" style="margin-top: 20px">
+              <strong>🎉 Profit NET: +210 - 100 = +110 RON ✅</strong><br />
+              <span class="success"
+                >✅ Logger: "WON: Liverpool FC - Chelsea vs Liverpool - Profit:
+                +210 RON"</span
+              >
+            </div>
+          </div>
+
+          <div class="arrow">↓</div>
+
+          <h3>ZIUA 6: Bot Începe Din Nou cu Miză Inițială</h3>
+
+          <div class="step">
+            <h4><span class="step-number">12</span>Strategia Se Resetează</h4>
+
+            <div class="code-block">
+              Citește Index: - cumulative_loss = 0 - progression_step = 0 ↓
+              Calculează miză: stake = (0 / (1.95 - 1)) + 100 =
+              <span class="success">100 RON</span> ↓ Următorul meci: "Liverpool
+              vs Man City" cu <span class="success">100 RON</span> ✅
+
+              <strong>Strategia continuă automat!</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- REZUMAT FINAL -->
+        <div class="section">
+          <h2><span class="emoji">📊</span>REZUMAT FLUX COMPLET</h2>
+
+          <div class="info">
+            <h3 style="margin-bottom: 15px">Pași Principali:</h3>
+            <ol style="line-height: 2">
+              <li>
+                <strong>User adaugă echipă</strong> → Backend populate Google
+                Sheets cu 20 meciuri
+              </li>
+              <li>
+                <strong>Bot rulează la ora setată</strong> → Citește primul meci
+                fără status
+              </li>
+              <li>
+                <strong>Bot citește cumulative_loss</strong> din Google Sheets
+                Index
+              </li>
+              <li><strong>Bot calculează miză Martingale</strong></li>
+              <li><strong>Bot plasează pariu pe Betfair</strong></li>
+              <li>
+                <strong>Bot scrie Status=PENDING</strong> în Google Sheets
+              </li>
+              <li>
+                <strong>Bot verifică rezultate</strong> → Update Status=WON/LOST
+              </li>
+              <li>
+                <strong>Bot update cumulative_loss</strong> în Google Sheets
+                Index
+              </li>
+              <li>
+                <strong>Strategia continuă automat</strong> cu următorul meci
+              </li>
+            </ol>
+          </div>
+
+          <div
+            class="info"
+            style="
+              margin-top: 20px;
+              background: #d4edda;
+              border-left-color: #48bb78;
+            "
+          >
+            <h3 style="color: #48bb78; margin-bottom: 15px">
+              ✅ Avantaje Multi-Tenant:
+            </h3>
+            <ul style="line-height: 2">
+              <li>
+                <strong>Izolare Completă:</strong> Fiecare user are propriile
+                credentials, sheets, teams
+              </li>
+              <li>
+                <strong>Scalabilitate:</strong> Bot rulează pentru toți userii
+                (staggered execution)
+              </li>
+              <li>
+                <strong>Security:</strong> Credentials encrypted, ownership
+                verification
+              </li>
+              <li>
+                <strong>Flexibilitate:</strong> Fiecare user poate avea planuri
+                diferite
+              </li>
+              <li>
+                <strong>Automatizare:</strong> User nu face NIMIC după ce adaugă
+                echipa!
+              </li>
+            </ul>
+          </div>
+
+          <div
+            class="info"
+            style="
+              margin-top: 20px;
+              background: #fff3cd;
+              border-left-color: #ed8936;
+            "
+          >
+            <h3 style="color: #ed8936; margin-bottom: 15px">⚠️ Importante:</h3>
+            <ul style="line-height: 2">
+              <li>
+                <strong>cumulative_loss și progression_step</strong> se citesc
+                DOAR din Google Sheets Index
+              </li>
+              <li>
+                <strong>Database</strong> se folosește doar pentru: user_id,
+                name, status (basic info)
+              </li>
+              <li>
+                <strong>Google Sheets</strong> = Source of Truth pentru
+                strategia Martingale
+              </li>
+              <li>
+                <strong>Bot verifică PENDING</strong> înainte să plaseze pariu
+                nou
+              </li>
+              <li><strong>Strategia se resetează</strong> automat la WON</li>
+            </ul>
+          </div>
+        </div>
+
+        <footer>
+          <p style="font-size: 1.2em; margin-bottom: 10px">
+            🚀 <strong>BETIX Multi-Tenant Bot System</strong>
+          </p>
+          <p>Documentație Completă - Versiune 1.0</p>
+          <p style="margin-top: 10px; opacity: 0.8">30 Noiembrie 2025</p>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>

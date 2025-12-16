@@ -1,0 +1,15 @@
+{
+  "betfair_app_key": "",
+  "betfair_username": "",
+  "betfair_password": "",
+  "betfair_cert_file": null,
+  "betfair_key_file": null,
+  "google_sheets_spreadsheet_id": "17HlXUzetQinggtfz0OSnzaeSKQudoL6-3D7UlK7neDs",
+  "google_credentials_file": null,
+  "bot_run_hour": 13,
+  "bot_run_minute": 0,
+  "initial_stake": 10.0,
+  "max_progression_steps": 7,
+  "betfair_connected": false,
+  "google_sheets_connected": true
+}
