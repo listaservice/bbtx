@@ -67,3 +67,6 @@ credentials/*.json
 # Docker volumes
 postgres_data/
 redis_data/
+
+# Deploy script (contains credentials)
+deploy.sh
