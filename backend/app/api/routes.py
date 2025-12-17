@@ -356,33 +356,24 @@ async def create_team(
             team.name
         )
 
-        # Fetch next 20 matches from Betfair with odds (using user's credentials)
+        # Fetch next 20 matches from Betfair with odds (using master credentials with SSL)
+        import os
         user_betfair_client = None
         try:
-            # Load user's Betfair credentials
-            engine = create_engine(settings.database_url)
-            with engine.connect() as conn:
-                result = conn.execute(text("""
-                    SELECT username_encrypted, password_encrypted, app_key_encrypted
-                    FROM betfair_credentials
-                    WHERE user_id = :user_id
-                """), {"user_id": current_user.id})
-                row = result.fetchone()
+            # Use master credentials with SSL certificate
+            master_app_key = os.environ.get("BETFAIR_MASTER_APP_KEY")
+            master_username = os.environ.get("BETFAIR_MASTER_USERNAME")
+            master_password = os.environ.get("BETFAIR_MASTER_PASSWORD")
 
-            if not row:
-                logger.warning(f"User {current_user.email} nu are credențiale Betfair - skip fetch matches")
+            if not all([master_app_key, master_username, master_password]):
+                logger.warning("Master Betfair credentials not configured - skip fetch matches")
             else:
-                # Decrypt credentials
-                username = encryption_service.decrypt(row.username_encrypted)
-                password = encryption_service.decrypt(row.password_encrypted)
-                app_key = encryption_service.decrypt(row.app_key_encrypted)
-
-                # Create user's Betfair client
+                # Create Betfair client with master credentials
                 user_betfair_client = BetfairClient()
                 user_betfair_client.configure(
-                    app_key=app_key,
-                    username=username,
-                    password=password
+                    app_key=master_app_key,
+                    username=master_username,
+                    password=master_password
                 )
 
                 await user_betfair_client.connect()
