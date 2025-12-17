@@ -900,32 +900,25 @@ async def get_betfair_status(
 
 @router.post("/settings/test-betfair", response_model=ApiResponse)
 async def test_betfair_connection(
-    current_user: User = Depends(get_current_user_jwt)
+    current_user: User = Depends(get_current_user_jwt),
+    db: Session = Depends(get_db)
 ):
     """Testează conexiunea la Betfair API pentru user-ul curent."""
     from app.services.betfair_client import BetfairClient
     from app.services.encryption import encryption_service
-    from sqlalchemy import text
-    from app.config import get_settings
+    from app.models.betfair_credentials import BetfairCredentials
 
-    settings = get_settings()
-    engine = create_engine(settings.database_url)
+    creds = db.query(BetfairCredentials).filter(
+        BetfairCredentials.user_id == current_user.id
+    ).first()
 
-    # Load user's credentials
-    with engine.connect() as conn:
-        result = conn.execute(text("""
-            SELECT username_encrypted, password_encrypted, app_key_encrypted
-            FROM betfair_credentials WHERE user_id = :user_id
-        """), {"user_id": current_user.id})
-        row = result.fetchone()
-
-    if not row:
+    if not creds:
         return ApiResponse(success=False, message="Credențiale Betfair neconfigurate")
 
     try:
-        username = encryption_service.decrypt(row.username_encrypted)
-        password = encryption_service.decrypt(row.password_encrypted)
-        app_key = encryption_service.decrypt(row.app_key_encrypted)
+        username = encryption_service.decrypt(creds.username_encrypted)
+        password = encryption_service.decrypt(creds.password_encrypted)
+        app_key = encryption_service.decrypt(creds.app_key_encrypted)
 
         user_client = BetfairClient()
         user_client.configure(app_key=app_key, username=username, password=password)
