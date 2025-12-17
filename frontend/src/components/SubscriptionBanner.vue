@@ -46,7 +46,7 @@ const daysRemaining = computed(() => {
 });
 
 const totalDays = computed(() => {
-  if (userInfo.value?.subscription_plan === "demo") return 3;
+  if (userInfo.value?.subscription_plan === "demo") return 10;
   return 30; // Toate planurile plătite au 30 zile
 });
 
@@ -143,8 +143,8 @@ const renewalDate = computed(() => {
             <div class="flex items-center space-x-1.5">
               <Clock class="h-4 w-4 text-gray-500" />
               <span class="text-gray-700">
-                <span class="font-semibold">{{ daysRemaining }}</span> din
-                <span class="font-semibold">{{ totalDays }}</span> zile rămase
+                <span class="font-semibold">{{ daysRemaining }}</span> zile
+                rămase
               </span>
             </div>
 
