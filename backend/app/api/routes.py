@@ -171,57 +171,39 @@ async def search_teams_betfair(
     current_user: User = Depends(get_current_user_jwt)
 ):
     """
-    Caută echipe pe Betfair API folosind credențialele user-ului.
+    Caută echipe pe Betfair API folosind credențialele master (cu certificat SSL).
     Returnează lista de echipe găsite pentru autocomplete.
     """
     if len(q) < 3:
         return []
 
     from app.services.betfair_client import BetfairClient
-    from app.services.encryption import encryption_service
-    from sqlalchemy import create_engine, text
-    from app.config import get_settings
+    import os
     import logging
     logger = logging.getLogger(__name__)
 
-    settings = get_settings()
-
     try:
-        # Load user's Betfair credentials
-        engine = create_engine(settings.database_url)
-        with engine.connect() as conn:
-            result = conn.execute(text("""
-                SELECT username_encrypted, password_encrypted, app_key_encrypted
-                FROM betfair_credentials
-                WHERE user_id = :user_id
-            """), {"user_id": current_user.id})
-            row = result.fetchone()
+        # Use master credentials with SSL certificate for search
+        master_app_key = os.environ.get("BETFAIR_MASTER_APP_KEY")
+        master_username = os.environ.get("BETFAIR_MASTER_USERNAME")
+        master_password = os.environ.get("BETFAIR_MASTER_PASSWORD")
 
-        if not row:
-            logger.warning(f"User {current_user.email} nu are credențiale Betfair configurate")
+        if not all([master_app_key, master_username, master_password]):
+            logger.error("Master Betfair credentials not configured")
             return []
 
-        # Decrypt credentials
-        try:
-            username = encryption_service.decrypt(row.username_encrypted)
-            password = encryption_service.decrypt(row.password_encrypted)
-            app_key = encryption_service.decrypt(row.app_key_encrypted)
-        except Exception as e:
-            logger.error(f"Failed to decrypt Betfair credentials for {current_user.email}: {e}")
-            return []
-
-        # Create and configure Betfair client for this user
+        # Create and configure Betfair client with master credentials
         user_betfair_client = BetfairClient()
         user_betfair_client.configure(
-            app_key=app_key,
-            username=username,
-            password=password
+            app_key=master_app_key,
+            username=master_username,
+            password=master_password
         )
 
         # Connect
         await user_betfair_client.connect()
         if not user_betfair_client.is_connected():
-            logger.warning(f"Nu s-a putut conecta la Betfair pentru {current_user.email}")
+            logger.warning(f"Nu s-a putut conecta la Betfair cu credențialele master")
             return []
 
         # Search events
