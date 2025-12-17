@@ -303,7 +303,7 @@ async function saveAndFinish() {
                 <li>
                   <strong>Deschide Demo Tool:</strong><br />
                   <a
-                    href="https://apps.betfair.com/visualisers/api-ng-account-operations/"
+                    href="https://apps.betfair.ro/visualisers/api-ng-account-operations/"
                     target="_blank"
                     class="underline font-medium ml-5"
                     >Accounts API Demo Tool</a
@@ -348,7 +348,7 @@ async function saveAndFinish() {
                   1. Login Betfair.ro
                 </a>
                 <a
-                  href="https://apps.betfair.com/visualisers/api-ng-account-operations/"
+                  href="https://apps.betfair.ro/visualisers/api-ng-account-operations/"
                   target="_blank"
                   class="inline-flex items-center text-blue-700 hover:text-blue-900 font-medium text-sm"
                 >
