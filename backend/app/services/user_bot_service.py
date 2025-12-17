@@ -221,13 +221,25 @@ class UserBotService:
 
             if stop_loss:
                 logger.warning(f"Stop loss atins pentru {team.name}")
-                # Pause team
+                # Pause team în DATABASE
                 from app.services.teams_repository import teams_repository
                 teams_repository.update_team(
                     team.id,
                     self.user_id,
                     TeamUpdate(status=TeamStatus.PAUSED)
                 )
+
+                # Sync status în Google Sheets
+                try:
+                    self.sheets_client.update_team_in_index(
+                        self.spreadsheet_id,
+                        team.id,
+                        {'id': team.id, 'name': team.name, 'status': 'paused'}
+                    )
+                    logger.info(f"Sheets sincronizat: {team.name} -> PAUSED (stop loss)")
+                except Exception as sheets_err:
+                    logger.warning(f"Nu s-a putut sincroniza Sheets pentru {team.name}: {sheets_err}")
+
                 result['reason'] = 'stop_loss_reached'
                 return result
 
@@ -465,18 +477,22 @@ class UserBotService:
                         )
                     )
 
-                    # Update Google Sheets (vizualizare)
-                    self.sheets_client.update_match_status(
-                        self.spreadsheet_id, team_name, event_name, "WON",
-                        profit_loss=profit_amount
-                    )
-                    self.sheets_client.update_team_progression(
-                        self.spreadsheet_id, team_name,
-                        cumulative_loss=new_cumulative_loss,
-                        progression_step=new_progression_step,
-                        won=True,
-                        profit=profit_amount
-                    )
+                    # Sync Google Sheets (vizualizare)
+                    try:
+                        self.sheets_client.update_match_status(
+                            self.spreadsheet_id, team_name, event_name, "WON",
+                            profit_loss=profit_amount
+                        )
+                        self.sheets_client.update_team_progression(
+                            self.spreadsheet_id, team_name,
+                            cumulative_loss=new_cumulative_loss,
+                            progression_step=new_progression_step,
+                            won=True,
+                            profit=profit_amount
+                        )
+                        logger.info(f"Sheets sincronizat: {team_name} WON")
+                    except Exception as sheets_err:
+                        logger.warning(f"Nu s-a putut sincroniza Sheets pentru {team_name} WON: {sheets_err}")
 
                 else:
                     # LOST
@@ -497,18 +513,22 @@ class UserBotService:
                         )
                     )
 
-                    # Update Google Sheets (vizualizare)
-                    self.sheets_client.update_match_status(
-                        self.spreadsheet_id, team_name, event_name, "LOST",
-                        profit_loss=loss_amount
-                    )
-                    self.sheets_client.update_team_progression(
-                        self.spreadsheet_id, team_name,
-                        cumulative_loss=new_cumulative_loss,
-                        progression_step=new_progression_step,
-                        won=False,
-                        profit=-loss_amount
-                    )
+                    # Sync Google Sheets (vizualizare)
+                    try:
+                        self.sheets_client.update_match_status(
+                            self.spreadsheet_id, team_name, event_name, "LOST",
+                            profit_loss=loss_amount
+                        )
+                        self.sheets_client.update_team_progression(
+                            self.spreadsheet_id, team_name,
+                            cumulative_loss=new_cumulative_loss,
+                            progression_step=new_progression_step,
+                            won=False,
+                            profit=-loss_amount
+                        )
+                        logger.info(f"Sheets sincronizat: {team_name} LOST")
+                    except Exception as sheets_err:
+                        logger.warning(f"Nu s-a putut sincroniza Sheets pentru {team_name} LOST: {sheets_err}")
 
             logger.info(f"✅ Check results completed for {self.user.email}: {results}")
             return results

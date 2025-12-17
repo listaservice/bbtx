@@ -195,6 +195,39 @@ class TeamsRepository:
             logger.info(f"Updated team {team_id} for user {user_id}")
             return self.get_team(team_id, user_id)
 
+    def get_team_by_name(self, team_name: str, user_id: str) -> Optional[Team]:
+        """Get a team by name (verify ownership)"""
+        with self.engine.connect() as conn:
+            result = conn.execute(text("""
+                SELECT * FROM teams
+                WHERE name = :team_name AND user_id = :user_id
+            """), {"team_name": team_name, "user_id": user_id})
+
+            row = result.fetchone()
+            if not row:
+                return None
+
+            return Team(
+                id=row.id,
+                user_id=row.user_id,
+                name=row.name,
+                betfair_id=row.betfair_id,
+                sport=Sport(row.sport),
+                league=row.league,
+                country=row.country,
+                cumulative_loss=row.cumulative_loss,
+                last_stake=row.last_stake,
+                progression_step=row.progression_step,
+                initial_stake=float(row.initial_stake) if hasattr(row, 'initial_stake') else 100.0,
+                status=TeamStatus(row.status),
+                total_matches=0,
+                matches_won=0,
+                matches_lost=0,
+                total_profit=0.0,
+                created_at=row.created_at,
+                updated_at=row.updated_at
+            )
+
     def delete_team(self, team_id: str, user_id: str) -> bool:
         """Delete a team (verify ownership)"""
         with self.engine.connect() as conn:

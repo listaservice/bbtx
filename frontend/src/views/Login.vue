@@ -127,7 +127,7 @@ async function handleLogin(): Promise<void> {
             </router-link>
           </p>
           <p class="text-xs text-gray-500 mt-2">
-            🎁 3 zile trial gratuit cu planul Demo
+            🎁 10 zile trial gratuit cu planul Demo
           </p>
         </div>
       </form>

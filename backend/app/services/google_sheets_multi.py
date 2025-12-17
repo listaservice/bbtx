@@ -69,7 +69,8 @@ class GoogleSheetsMultiService:
 
     def create_user_spreadsheet(self, user_email: str, user_id: str) -> str:
         """
-        Create a new spreadsheet for a user
+        Allocate an available spreadsheet from the pool for a new user.
+        Spreadsheets are pre-created manually in the Betix-Users folder.
 
         Args:
             user_email: User's email address
@@ -79,17 +80,32 @@ class GoogleSheetsMultiService:
             Spreadsheet ID
         """
         try:
-            # Create spreadsheet with user's email in title
-            spreadsheet_title = f"Betix - {user_email}"
-            spreadsheet = self.client.create(spreadsheet_title)
-            spreadsheet_id = spreadsheet.id
+            from googleapiclient.discovery import build
 
-            logger.info(f"Created spreadsheet for user {user_email}: {spreadsheet_id}")
+            BETIX_USERS_FOLDER_ID = "1z5I-19J719ox1IIbs6ZZGs8JEcoTwukj"
 
-            # Setup initial structure
-            self._setup_spreadsheet_structure(spreadsheet)
+            drive_service = build('drive', 'v3', credentials=self.credentials)
 
-            # Share with user (read/write access)
+            results = drive_service.files().list(
+                q=f"'{BETIX_USERS_FOLDER_ID}' in parents and mimeType='application/vnd.google-apps.spreadsheet' and name contains 'Betix-User-'",
+                fields='files(id, name)',
+                orderBy='name'
+            ).execute()
+
+            available_files = results.get('files', [])
+
+            if not available_files:
+                raise Exception("Nu mai sunt spreadsheet-uri disponibile în pool. Contactează administratorul.")
+
+            selected_file = available_files[0]
+            spreadsheet_id = selected_file['id']
+
+            spreadsheet = self.client.open_by_key(spreadsheet_id)
+            new_title = f"Betix - {user_email}"
+            spreadsheet.update_title(new_title)
+
+            logger.info(f"Allocated spreadsheet {selected_file['name']} -> {new_title} for user {user_email}")
+
             try:
                 spreadsheet.share(user_email, perm_type='user', role='writer')
                 logger.info(f"Shared spreadsheet with {user_email}")
@@ -99,7 +115,7 @@ class GoogleSheetsMultiService:
             return spreadsheet_id
 
         except Exception as e:
-            logger.error(f"Failed to create spreadsheet for {user_email}: {e}")
+            logger.error(f"Failed to allocate spreadsheet for {user_email}: {e}")
             raise
 
     def _setup_spreadsheet_structure(self, spreadsheet):

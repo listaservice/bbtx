@@ -215,7 +215,7 @@ UPDATE users
 SET subscription_plan = 'demo',
     subscription_status = 'trial',
     max_teams = 5,
-    trial_ends_at = NOW() + INTERVAL '3 days'
+    trial_ends_at = NOW() + INTERVAL '10 days'
 WHERE subscription_status = 'inactive';
 
 -- Verificare

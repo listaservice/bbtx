@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Factură SSL Certificate - Sectigo Essential SSL</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f5f5;
+        padding: 20px;
+      }
+      .invoice {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 3px solid #c41e3a;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+      }
+      .company-info h1 {
+        color: #c41e3a;
+        font-size: 28px;
+        margin-bottom: 5px;
+      }
+      .company-info p {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .invoice-details {
+        text-align: right;
+      }
+      .invoice-details h2 {
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      .invoice-details p {
+        color: #666;
+        font-size: 14px;
+      }
+      .paid-stamp {
+        background: #28a745;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 10px;
+        font-size: 16px;
+      }
+      .parties {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+      }
+      .party {
+        width: 45%;
+      }
+      .party h3 {
+        color: #c41e3a;
+        font-size: 14px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+      }
+      .party p {
+        color: #333;
+        font-size: 14px;
+        line-height: 1.8;
+      }
+      .party strong {
+        color: #000;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+      }
+      th {
+        background: #c41e3a;
+        color: white;
+        padding: 12px 15px;
+        text-align: left;
+        font-size: 14px;
+      }
+      th:last-child,
+      td:last-child {
+        text-align: right;
+      }
+      td {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+        color: #333;
+      }
+      .item-description {
+        color: #666;
+        font-size: 12px;
+        margin-top: 5px;
+      }
+      .totals {
+        width: 300px;
+        margin-left: auto;
+      }
+      .totals table {
+        margin-bottom: 0;
+      }
+      .totals td {
+        padding: 10px 15px;
+        border: none;
+      }
+      .totals tr:last-child {
+        background: #f8f9fa;
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .totals tr:last-child td {
+        color: #c41e3a;
+      }
+      .payment-info {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 30px;
+      }
+      .payment-info h3 {
+        color: #333;
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+      .payment-info p {
+        color: #666;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      .footer {
+        text-align: center;
+        color: #999;
+        font-size: 12px;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+      }
+      .certificate-details {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+      .certificate-details h4 {
+        color: #856404;
+        margin-bottom: 10px;
+      }
+      .certificate-details p {
+        color: #856404;
+        font-size: 13px;
+      }
+      @media print {
+        body {
+          background: white;
+          padding: 0;
+        }
+        .invoice {
+          box-shadow: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="invoice">
+      <div class="header">
+        <div class="company-info">
+          <h1>SecureHost SRL</h1>
+          <p>
+            Str. Tehnologiei Nr. 42, Sector 1<br />
+            București, 010101, România<br />
+            CUI: RO12345678<br />
+            Reg. Com.: J40/1234/2020<br />
+            Email: billing@securehost.ro<br />
+            Tel: +40 21 123 4567
+          </p>
+        </div>
+        <div class="invoice-details">
+          <h2>FACTURĂ</h2>
+          <p><strong>Nr:</strong> SH-2025-001248</p>
+          <p><strong>Data emiterii:</strong> 17.12.2025</p>
+          <p><strong>Data scadenței:</strong> 17.12.2026</p>
+          <div class="paid-stamp">✓ PLĂTITĂ</div>
+        </div>
+      </div>
+
+      <div class="parties">
+        <div class="party">
+          <h3>Furnizor</h3>
+          <p>
+            <strong>SecureHost SRL</strong><br />
+            Str. Tehnologiei Nr. 42, Sector 1<br />
+            București, 010101<br />
+            România<br />
+            CUI: RO12345678<br />
+            Cont: RO49 AAAA 1B31 0075 9384 0000<br />
+            Banca: ING Bank
+          </p>
+        </div>
+        <div class="party">
+          <h3>Client</h3>
+          <p>
+            <strong>Stancu Ionuț</strong><br />
+            Aleea Valea Salciei 12<br />
+            București<br />
+            România
+          </p>
+        </div>
+      </div>
+
+      <div class="certificate-details">
+        <h4>🔒 Detalii Certificat SSL</h4>
+        <p>
+          <strong>Domeniu:</strong> royaldeluxe.ro<br />
+          <strong>Tip:</strong> Sectigo Essential SSL (DV)<br />
+          <strong>Valabilitate:</strong> 17.12.2025 - 17.12.2026 (1 an)<br />
+          <strong>Autoritate:</strong> Sectigo (Comodo CA)
+        </p>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 50%">Descriere</th>
+            <th style="width: 15%">Cantitate</th>
+            <th style="width: 15%">Preț unitar</th>
+            <th style="width: 20%">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <strong>Sectigo Essential SSL Certificate</strong>
+              <div class="item-description">
+                Certificat SSL validare domeniu (DV)<br />
+                • Criptare 256-bit<br />
+                • Compatibilitate 99.6%<br />
+                • Garanție $10,000 USD<br />
+                • Reemitere gratuită<br />
+                • Valabilitate: 1 an
+              </div>
+            </td>
+            <td>1</td>
+            <td>10.00 €</td>
+            <td>10.00 €</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>Instalare și configurare SSL</strong>
+              <div class="item-description">
+                Instalare certificat pe server + configurare HTTPS
+              </div>
+            </td>
+            <td>1</td>
+            <td>0.00 €</td>
+            <td>GRATUIT</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="totals">
+        <table>
+          <tr>
+            <td>Subtotal:</td>
+            <td>10.00 €</td>
+          </tr>
+          <tr>
+            <td>TVA (19%):</td>
+            <td>1.90 €</td>
+          </tr>
+          <tr>
+            <td><strong>TOTAL:</strong></td>
+            <td><strong>11.90 €</strong></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="payment-info">
+        <h3>💳 Informații Plată</h3>
+        <p>
+          <strong>Metodă de plată:</strong> Card bancar (Visa ****4521)<br />
+          <strong>Data plății:</strong> 17.12.2025, ora 11:45<br />
+          <strong>Referință tranzacție:</strong> TXN-2025121711450092<br />
+          <strong>Status:</strong>
+          <span style="color: #28a745; font-weight: bold"
+            >Plată confirmată ✓</span
+          >
+        </p>
+      </div>
+
+      <div class="footer">
+        <p>
+          Această factură a fost generată electronic și este valabilă fără
+          semnătură și ștampilă.<br />
+          Pentru întrebări, contactați-ne la billing@securehost.ro<br /><br />
+          <strong>SecureHost SRL</strong> - Soluții de hosting și securitate
+          web<br />
+          www.securehost.ro
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

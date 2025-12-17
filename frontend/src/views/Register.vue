@@ -82,14 +82,14 @@ async function handleRegister(): Promise<void> {
         <p class="text-gray-500 mt-2">
           Creează cont și primești
           <span class="font-semibold text-primary-600"
-            >3 zile trial gratuit</span
+            >10 zile trial gratuit</span
           >
         </p>
         <div
           class="mt-4 bg-primary-50 border border-primary-200 rounded-lg p-3"
         >
           <p class="text-sm text-primary-800 font-medium">
-            🎁 Plan Demo: 5 echipe gratuit pentru 3 zile!
+            🎁 Plan Demo: 5 echipe gratuit pentru 10 zile!
           </p>
         </div>
       </div>
@@ -223,7 +223,7 @@ async function handleRegister(): Promise<void> {
       <!-- Trial Info -->
       <div class="mt-6 text-center">
         <p class="text-xs text-gray-500">
-          Prin înregistrare, primești automat 3 zile de trial gratuit cu planul
+          Prin înregistrare, primești automat 10 zile de trial gratuit cu planul
           Demo (5 echipe).
         </p>
       </div>

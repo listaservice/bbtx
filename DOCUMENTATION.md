@@ -1,7 +1,7 @@
 # 📚 BETIX - Documentație Completă
 
 **Platformă SaaS Multi-Tenant pentru Pariuri Automate pe Betfair Exchange**
-Versiune: 2.1 | Data: 11 Decembrie 2025
+Versiune: 2.2 | Data: 17 Decembrie 2025
 
 ---
 
@@ -383,7 +383,7 @@ Pentru fiecare echipă:
 
 ### Structură
 
-**Spreadsheet:** `Clabot`
+**Spreadsheet:** `Betix - [user_email]`
 
 #### Sheet: Index
 
