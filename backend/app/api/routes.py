@@ -20,6 +20,8 @@ from app.services.auth import authenticate, get_current_user
 from app.dependencies import get_current_user as get_current_user_jwt
 from app.models.user import User
 from app.config import get_settings
+from app.database import get_db
+from sqlalchemy.orm import Session
 
 settings = get_settings()
 
