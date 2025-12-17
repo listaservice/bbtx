@@ -206,25 +206,22 @@ class GoogleSheetsMultiService:
             # Create new sheet
             worksheet = spreadsheet.add_worksheet(title=team_name, rows=1000, cols=20)
 
-            # Setup headers for team sheet (Romanian names to match code expectations)
+            # Setup headers for team sheet (same order as PARIURI)
             headers = [
-                "Meci",           # Match name
-                "Data",           # Match date (YYYY-MM-DDTHH:MM format)
-                "Cotă",           # Odds
-                "Miză",           # Stake
-                "Status",         # Status (PENDING, WON, LOST, ERROR)
-                "Profit/Loss",    # Profit or loss amount
-                "Bet ID",         # Betfair bet ID
-                "Competiție",     # Competition name
-                "Plasare",        # Placed at timestamp
-                "Finalizare",     # Settled at timestamp
-                "Note"            # Notes
+                "Data",           # A: Match date (YYYY-MM-DDTHH:MM format)
+                "Meci",           # B: Match name
+                "Competiție",     # C: Competition name
+                "Cotă",           # D: Odds
+                "Miză",           # E: Stake
+                "Status",         # F: Status (PROGRAMAT, PENDING, WON, LOST)
+                "Profit",         # G: Profit or loss amount
+                "Bet ID"          # H: Betfair bet ID
             ]
 
-            worksheet.update('A1:K1', [headers])
+            worksheet.update('A1:H1', [headers])
 
             # Format header row
-            worksheet.format('A1:M1', {
+            worksheet.format('A1:H1', {
                 "backgroundColor": {"red": 0.2, "green": 0.6, "blue": 0.4},
                 "textFormat": {"bold": True, "foregroundColor": {"red": 1, "green": 1, "blue": 1}},
                 "horizontalAlignment": "CENTER"
@@ -614,16 +611,16 @@ class GoogleSheetsMultiService:
             spreadsheet = self.client.open_by_key(spreadsheet_id)
             team_sheet = spreadsheet.worksheet(team_name)
 
-            # Append new row (A=Meci, B=Data, C=Cotă, D=Miză, E=Status, F=Profit/Loss, G=Bet ID, H=Competiție)
+            # Append new row (A=Data, B=Meci, C=Competiție, D=Cotă, E=Miză, F=Status, G=Profit, H=Bet ID)
             row = [
-                match_data.get('event_name', ''),      # A: Meci
-                match_data.get('start_time', ''),      # B: Data
-                match_data.get('odds', ''),            # C: Cotă
-                '',                                     # D: Miză (empty - filled when bet placed)
-                '',                                     # E: Status (empty - filled when bet placed)
-                '',                                     # F: Profit/Loss (empty - filled when settled)
-                '',                                     # G: Bet ID (empty - filled when bet placed)
-                match_data.get('competition', '')      # H: Competiție
+                match_data.get('start_time', ''),      # A: Data
+                match_data.get('event_name', ''),      # B: Meci
+                match_data.get('competition', ''),     # C: Competiție
+                match_data.get('odds', ''),            # D: Cotă
+                '',                                     # E: Miză (empty - filled when bet placed)
+                'PROGRAMAT',                           # F: Status
+                '',                                     # G: Profit (empty - filled when settled)
+                ''                                      # H: Bet ID (empty - filled when bet placed)
             ]
 
             team_sheet.append_row(row)
