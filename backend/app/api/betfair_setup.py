@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import Optional
 import logging
+import httpx
+import os
 
 from app.database import get_db
 from app.models.user import User
@@ -24,6 +26,11 @@ class VerifyCredentialsRequest(BaseModel):
     password: str
 
 
+class GenerateAppKeyRequest(BaseModel):
+    username: str
+    password: str
+
+
 class SaveCredentialsRequest(BaseModel):
     username: str
     password: str
@@ -37,6 +44,201 @@ class CredentialsStatusResponse(BaseModel):
     has_app_key: bool
     has_certificate: bool
     username: Optional[str] = None
+
+
+MASTER_APP_KEY = os.environ.get("BETFAIR_MASTER_APP_KEY", "")
+
+
+@router.post("/generate-app-key")
+async def generate_betfair_app_key(
+    request: GenerateAppKeyRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Login to Betfair and generate App Key automatically for user.
+    Uses master App Key for login, then creates user's own App Key.
+    """
+    try:
+        if not request.username or not request.password:
+            return {
+                "success": False,
+                "message": "Username și parola sunt obligatorii"
+            }
+
+        if not MASTER_APP_KEY:
+            logger.error("BETFAIR_MASTER_APP_KEY not configured")
+            return {
+                "success": False,
+                "message": "Configurare server incompletă. Contactează administratorul."
+            }
+
+        # Step 1: Login to Betfair using Interactive Login API (Romania endpoint)
+        login_url = "https://identitysso.betfair.ro/api/login"
+
+        async with httpx.AsyncClient() as client:
+            login_response = await client.post(
+                login_url,
+                headers={
+                    "Accept": "application/json",
+                    "X-Application": MASTER_APP_KEY,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                data={
+                    "username": request.username,
+                    "password": request.password
+                }
+            )
+
+            login_data = login_response.json()
+            logger.info(f"Betfair login response status: {login_data.get('status')}")
+
+            if login_data.get("status") != "SUCCESS":
+                error_msg = login_data.get("error", "Login eșuat")
+                return {
+                    "success": False,
+                    "message": f"Login Betfair eșuat: {error_msg}"
+                }
+
+            session_token = login_data.get("token")
+            if not session_token:
+                return {
+                    "success": False,
+                    "message": "Nu s-a obținut session token de la Betfair"
+                }
+
+            # Step 2: Check if user already has App Keys
+            get_keys_url = "https://api.betfair.com/exchange/account/rest/v1.0/getDeveloperAppKeys/"
+
+            keys_response = await client.post(
+                get_keys_url,
+                headers={
+                    "Accept": "application/json",
+                    "X-Authentication": session_token,
+                    "Content-Type": "application/json"
+                },
+                json={}
+            )
+
+            existing_keys = keys_response.json()
+            logger.info(f"Existing keys response: {existing_keys}")
+
+            # Check if keys already exist
+            if isinstance(existing_keys, list) and len(existing_keys) > 0:
+                # User already has App Keys, find the Delayed one
+                for app in existing_keys:
+                    app_versions = app.get("appVersions", [])
+                    for version in app_versions:
+                        if version.get("delayData", False) and version.get("active", False):
+                            delayed_key = version.get("applicationKey")
+                            if delayed_key:
+                                logger.info(f"Found existing Delayed App Key for {request.username}")
+
+                                # Save credentials with existing key
+                                await save_user_credentials(
+                                    db, current_user, request.username,
+                                    request.password, delayed_key
+                                )
+
+                                return {
+                                    "success": True,
+                                    "message": "Credențiale salvate cu App Key existent! 🎉",
+                                    "app_key": delayed_key
+                                }
+
+            # Step 3: Create new App Keys
+            create_keys_url = "https://api.betfair.com/exchange/account/rest/v1.0/createDeveloperAppKeys/"
+
+            app_name = f"BetixBot_{current_user.id[:8]}"
+
+            create_response = await client.post(
+                create_keys_url,
+                headers={
+                    "Accept": "application/json",
+                    "X-Authentication": session_token,
+                    "Content-Type": "application/json"
+                },
+                json={"appName": app_name}
+            )
+
+            create_data = create_response.json()
+            logger.info(f"Create App Key response: {create_data}")
+
+            # Extract Delayed App Key from response
+            delayed_app_key = None
+            if isinstance(create_data, dict):
+                app_versions = create_data.get("appVersions", [])
+                for version in app_versions:
+                    if version.get("delayData", False):
+                        delayed_app_key = version.get("applicationKey")
+                        break
+
+            if not delayed_app_key:
+                # Check if error
+                if isinstance(create_data, dict) and "error" in str(create_data).lower():
+                    return {
+                        "success": False,
+                        "message": f"Eroare la crearea App Key: {create_data}"
+                    }
+                return {
+                    "success": False,
+                    "message": "Nu s-a putut obține Delayed App Key"
+                }
+
+            # Step 4: Save credentials
+            await save_user_credentials(
+                db, current_user, request.username,
+                request.password, delayed_app_key
+            )
+
+            logger.info(f"Successfully generated App Key for user {current_user.email}")
+
+            return {
+                "success": True,
+                "message": "App Key generat și credențiale salvate cu succes! 🎉",
+                "app_key": delayed_app_key
+            }
+
+    except Exception as e:
+        logger.error(f"Error generating App Key: {e}")
+        return {
+            "success": False,
+            "message": f"Eroare: {str(e)}"
+        }
+
+
+async def save_user_credentials(
+    db: Session,
+    user: User,
+    username: str,
+    password: str,
+    app_key: str
+):
+    """Helper to save encrypted credentials"""
+    existing = db.query(BetfairCredentials).filter(
+        BetfairCredentials.user_id == user.id
+    ).first()
+
+    encrypted_username = encryption_service.encrypt(username)
+    encrypted_password = encryption_service.encrypt(password)
+    encrypted_app_key = encryption_service.encrypt(app_key)
+
+    if existing:
+        existing.username_encrypted = encrypted_username
+        existing.password_encrypted = encrypted_password
+        existing.app_key_encrypted = encrypted_app_key
+        existing.is_configured = True
+    else:
+        credentials = BetfairCredentials(
+            user_id=user.id,
+            username_encrypted=encrypted_username,
+            password_encrypted=encrypted_password,
+            app_key_encrypted=encrypted_app_key,
+            is_configured=True
+        )
+        db.add(credentials)
+
+    db.commit()
 
 
 @router.post("/verify-credentials")
