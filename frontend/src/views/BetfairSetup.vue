@@ -303,7 +303,7 @@ async function saveAndFinish() {
                 <li>
                   <strong>Deschide Demo Tool:</strong><br />
                   <a
-                    href="https://apps.betfair.ro/visualisers/api-ng-account-operations/"
+                    href="https://apps.betfair.com/visualisers/api-ng-account-operations/"
                     target="_blank"
                     class="underline font-medium ml-5"
                     >Accounts API Demo Tool</a
@@ -311,14 +311,26 @@ async function saveAndFinish() {
                   <span class="ml-5 text-xs">(Se deschide în tab nou)</span>
                 </li>
                 <li>
+                  <strong>Copiază Session Token:</strong><br />
+                  <span class="ml-5"
+                    >• Pe betfair.ro apasă <strong>F12</strong> → tab
+                    <strong>Application</strong> →
+                    <strong>Cookies</strong></span
+                  ><br />
+                  <span class="ml-5"
+                    >• Găsește cookie-ul <strong>ssoid</strong> și copiază
+                    valoarea</span
+                  ><br />
+                  <span class="ml-5"
+                    >• Lipește-o în câmpul <strong>Session Token</strong> din
+                    Demo Tool</span
+                  >
+                </li>
+                <li>
                   <strong>În Demo Tool:</strong><br />
                   <span class="ml-5"
                     >• Selectează operația:
                     <strong>createDeveloperAppKeys</strong></span
-                  ><br />
-                  <span class="ml-5"
-                    >• Refresh pagina (F5) → Session Token se completează
-                    automat</span
                   ><br />
                   <span class="ml-5"
                     >• Introdu Application Name:
@@ -348,7 +360,7 @@ async function saveAndFinish() {
                   1. Login Betfair.ro
                 </a>
                 <a
-                  href="https://apps.betfair.ro/visualisers/api-ng-account-operations/"
+                  href="https://apps.betfair.com/visualisers/api-ng-account-operations/"
                   target="_blank"
                   class="inline-flex items-center text-blue-700 hover:text-blue-900 font-medium text-sm"
                 >
