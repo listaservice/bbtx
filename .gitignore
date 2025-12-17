@@ -70,3 +70,4 @@ redis_data/
 
 # Deploy script (contains credentials)
 deploy.sh
+backend/credentials/google_service_account.json
