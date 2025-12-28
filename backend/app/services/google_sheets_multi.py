@@ -106,11 +106,23 @@ class GoogleSheetsMultiService:
 
             logger.info(f"Allocated spreadsheet {selected_file['name']} -> {new_title} for user {user_email}")
 
+            # Share spreadsheet cu user-ul (permisiune Editor)
             try:
-                spreadsheet.share(user_email, perm_type='user', role='writer')
-                logger.info(f"Shared spreadsheet with {user_email}")
+                # Folosim Drive API pentru share mai robust
+                drive_service.permissions().create(
+                    fileId=spreadsheet_id,
+                    body={
+                        'type': 'user',
+                        'role': 'writer',
+                        'emailAddress': user_email
+                    },
+                    sendNotificationEmail=False
+                ).execute()
+                logger.info(f"✅ Shared spreadsheet with {user_email} (Editor access)")
             except Exception as e:
-                logger.warning(f"Could not share spreadsheet with {user_email}: {e}")
+                logger.error(f"❌ Failed to share spreadsheet with {user_email}: {e}")
+                # Nu aruncăm eroare - spreadsheet-ul e alocat, doar share-ul a eșuat
+                # User-ul poate cere acces manual
 
             return spreadsheet_id
 
