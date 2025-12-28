@@ -100,3 +100,8 @@ export interface WebSocketMessage {
   message?: string;
   level?: "info" | "success" | "warning" | "error";
 }
+
+export interface BetfairTeamResult {
+  name: string;
+  selectionId: string;
+}

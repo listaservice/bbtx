@@ -25,13 +25,14 @@ const expandedTeam = ref<string | null>(null);
 
 const newTeam = ref<TeamCreate>({
   name: "",
+  betfair_id: "",
   sport: "football",
   league: "Auto",
   country: "",
 });
 
 const searchQuery = ref("");
-const searchResults = ref<string[]>([]);
+const searchResults = ref<Array<{ name: string; selectionId: string }>>([]);
 const isSearching = ref(false);
 const showDropdown = ref(false);
 let searchTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -67,9 +68,10 @@ watch(searchQuery, (newVal) => {
   }, 300);
 });
 
-function selectTeam(teamName: string): void {
-  newTeam.value.name = teamName;
-  searchQuery.value = teamName;
+function selectTeam(team: { name: string; selectionId: string }): void {
+  newTeam.value.name = team.name;
+  newTeam.value.betfair_id = team.selectionId;
+  searchQuery.value = team.name;
   showDropdown.value = false;
 }
 
@@ -94,7 +96,13 @@ async function handleAddTeam(): Promise<void> {
 
   await teamsStore.createTeam(newTeam.value);
 
-  newTeam.value = { name: "", sport: "football", league: "Auto", country: "" };
+  newTeam.value = {
+    name: "",
+    betfair_id: "",
+    sport: "football",
+    league: "Auto",
+    country: "",
+  };
   searchQuery.value = "";
   showAddForm.value = false;
 }
@@ -207,12 +215,12 @@ function formatCurrency(value: number): string {
           >
             <button
               v-for="team in searchResults"
-              :key="team"
+              :key="team.selectionId"
               type="button"
               class="w-full px-4 py-2 text-left hover:bg-blue-50 focus:bg-blue-50 focus:outline-none"
               @mousedown.prevent="selectTeam(team)"
             >
-              {{ team }}
+              {{ team.name }}
             </button>
           </div>
 

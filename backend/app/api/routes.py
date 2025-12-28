@@ -215,30 +215,63 @@ async def search_teams_betfair(
         # Disconnect after search
         await user_betfair_client.disconnect()
 
-        # Skip keywords pentru echipe rezerve/tineret
-        skip_keywords = ["(Res)", "U19", "U21", "U23", "Women", "Feminin", "II", "B)", "(W)"]
+        # Skip keywords pentru echipe rezerve/tineret/feminine (COMPLETE ca în Clabot)
+        skip_keywords = [
+            "(Res)", "U19", "U20", "U21", "U23",
+            "Women", "Feminin", "Feminine",
+            "II", "B)", "(W)",
+            "Castilla", "Juvenil"
+        ]
 
-        # Extragem numele unice ale echipelor din evenimente
-        team_names = set()
+        # Extragem echipe cu selectionId (ca în Clabot)
+        teams_dict = {}
+
         for event in events[:20]:
-            event_name = event.get("event", {}).get("name", "")
+            event_data = event.get("event", {})
+            event_id = event_data.get("id", "")
+            event_name = event_data.get("name", "")
 
             # Skip meciuri cu echipe rezerve/tineret
             if any(kw in event_name for kw in skip_keywords):
                 continue
 
-            # Evenimentele sunt "Team A v Team B"
-            if " v " in event_name:
-                parts = event_name.split(" v ")
-                for part in parts:
-                    part = part.strip()
-                    # Filtram doar echipele care contin query-ul
-                    if q.lower() in part.lower():
-                        team_names.add(part)
+            if not event_id:
+                continue
 
-        # Sortam alfabetic si returnam
-        results = sorted(list(team_names))
-        logger.info(f"Search Betfair '{q}' for {current_user.email}: {len(results)} echipe găsite")
+            try:
+                # Get market pentru a extrage runners cu selectionId
+                markets = await user_betfair_client.list_market_catalogue(
+                    event_ids=[event_id],
+                    market_type_codes=["MATCH_ODDS"]
+                )
+
+                if markets:
+                    market = markets[0]
+                    runners = market.get("runners", [])
+
+                    for runner in runners:
+                        runner_name = runner.get("runnerName", "")
+                        selection_id = str(runner.get("selectionId", ""))
+
+                        # Skip runners cu keywords
+                        if any(kw in runner_name for kw in skip_keywords):
+                            continue
+
+                        # Doar echipele care conțin query-ul
+                        if q.lower() in runner_name.lower() and runner_name not in teams_dict:
+                            teams_dict[runner_name] = selection_id
+
+            except Exception as e:
+                logger.warning(f"Eroare la preluarea runners pentru {event_name}: {e}")
+                continue
+
+        # Returnează obiecte cu name și selectionId (ca în Clabot)
+        results = sorted(
+            [{"name": name, "selectionId": sel_id} for name, sel_id in teams_dict.items()],
+            key=lambda x: x["name"]
+        )
+
+        logger.info(f"Search Betfair '{q}' for {current_user.email}: {len(results)} echipe găsite cu selectionId")
         return results
 
     except Exception as e:
