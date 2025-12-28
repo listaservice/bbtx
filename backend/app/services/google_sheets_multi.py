@@ -474,16 +474,16 @@ class GoogleSheetsMultiService:
 
             row = cell.row
 
-            # Update columns (A=Meci, B=Data, C=Cotă, D=Miză, E=Status, F=Profit/Loss, G=Bet ID)
+            # Update columns (A=Data, B=Meci, C=Competiție, D=Cotă, E=Miză, F=Status, G=Profit, H=Bet ID)
             updates = []
             if stake is not None:
-                updates.append({'range': f'D{row}', 'values': [[stake]]})  # Miză column (D)
+                updates.append({'range': f'E{row}', 'values': [[stake]]})  # Miză column (E)
             if status:
-                updates.append({'range': f'E{row}', 'values': [[status]]})  # Status column (E)
+                updates.append({'range': f'F{row}', 'values': [[status]]})  # Status column (F)
             if profit_loss is not None:
-                updates.append({'range': f'F{row}', 'values': [[profit_loss]]})  # Profit/Loss column (F)
+                updates.append({'range': f'G{row}', 'values': [[profit_loss]]})  # Profit column (G)
             if bet_id:
-                updates.append({'range': f'G{row}', 'values': [[bet_id]]})  # Bet ID column (G)
+                updates.append({'range': f'H{row}', 'values': [[bet_id]]})  # Bet ID column (H)
 
             if updates:
                 team_sheet.batch_update(updates)
