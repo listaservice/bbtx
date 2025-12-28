@@ -432,6 +432,12 @@ async def create_team(
                         logger.info(f"Skip echipă rezerve/tineret: {event_name}")
                         continue
 
+                    # Verificare EXTRA: numele echipei trebuie să apară în numele meciului
+                    # Previne bug-ul unde "Real Madrid" găsește și "Real Sociedad"
+                    if team.name.lower() not in event_name.lower():
+                        logger.info(f"Skip {event_name} - {team.name} nu apare în numele meciului")
+                        continue
+
                     # Get odds and start time from market catalogue
                     odds = ""
                     market_start_time = ""
