@@ -338,6 +338,9 @@ async def create_team(
             detail=f"Ai atins limita de echipe pentru planul tău ({current_count}/{max_teams}). Upgrade pentru mai multe echipe."
         )
 
+    # Folosește miza inițială din request sau valoarea globală ca fallback
+    initial_stake_value = team_create.initial_stake if team_create.initial_stake else settings.bot_initial_stake
+
     team = Team(
         id=str(uuid4()),
         user_id=current_user.id,
@@ -347,9 +350,9 @@ async def create_team(
         league=team_create.league,
         country=team_create.country,
         cumulative_loss=0.0,
-        last_stake=settings.bot_initial_stake,
+        last_stake=initial_stake_value,
         progression_step=0,
-        initial_stake=settings.bot_initial_stake,
+        initial_stake=initial_stake_value,
         status=TeamStatus.ACTIVE,
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow()
