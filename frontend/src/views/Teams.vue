@@ -29,6 +29,7 @@ const newTeam = ref<TeamCreate>({
   sport: "football",
   league: "Auto",
   country: "",
+  initial_stake: 5,
 });
 
 const searchQuery = ref("");
@@ -241,7 +242,20 @@ function formatCurrency(value: number): string {
           />
         </div>
 
-        <div class="md:col-span-2 flex justify-end space-x-3">
+        <div>
+          <label class="label">Miză Inițială (RON)</label>
+          <input
+            v-model.number="newTeam.initial_stake"
+            type="number"
+            min="1"
+            step="1"
+            class="input"
+            placeholder="100"
+            required
+          />
+        </div>
+
+        <div class="md:col-span-3 flex justify-end space-x-3">
           <button
             type="button"
             @click="showAddForm = false"

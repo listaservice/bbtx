@@ -24,6 +24,7 @@ export interface TeamCreate {
   sport: "football" | "basketball";
   league: string;
   country: string;
+  initial_stake?: number;
 }
 
 export interface TeamUpdate {
