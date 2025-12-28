@@ -49,7 +49,8 @@ onMounted(() => {
 watch(searchQuery, (newVal) => {
   if (searchTimeout) clearTimeout(searchTimeout);
 
-  if (newVal.length < 3) {
+  // Verifică dacă e string (nu object)
+  if (typeof newVal !== "string" || newVal.length < 3) {
     searchResults.value = [];
     showDropdown.value = false;
     return;
