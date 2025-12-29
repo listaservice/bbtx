@@ -61,17 +61,8 @@ async def check_active_bets(betfair_client: BetfairClient):
     try:
         logger.info("Querying Betfair API for active bets...")
 
-        # Call Betfair API to list current orders
-        response = await betfair_client._call_api(
-            "listCurrentOrders",
-            {}
-        )
-
-        if not response:
-            logger.error("Failed to get response from Betfair API")
-            return []
-
-        current_orders = response.get("currentOrders", [])
+        # Use the correct method from BetfairClient
+        current_orders = await betfair_client.get_current_orders()
 
         logger.info(f"Found {len(current_orders)} active bets")
 
