@@ -70,39 +70,42 @@ class BetfairClient:
         self._cert_path = cert_path
         self._key_path = key_path
 
-        # Check for certificate paths in environment first
-        env_cert_path = os.environ.get("BETFAIR_CERT_PATH")
-        env_key_path = os.environ.get("BETFAIR_KEY_PATH")
+        # Only use environment variables if NO certificate was provided by user
+        # This allows user-specific authentication (with or without cert)
+        if cert_path is None and key_path is None:
+            # Check for certificate paths in environment
+            env_cert_path = os.environ.get("BETFAIR_CERT_PATH")
+            env_key_path = os.environ.get("BETFAIR_KEY_PATH")
 
-        if env_cert_path and env_key_path and os.path.exists(env_cert_path) and os.path.exists(env_key_path):
-            self._cert_path = env_cert_path
-            self._key_path = env_key_path
-            logger.info(f"Certificate loaded from paths: {env_cert_path}")
-        else:
-            # Fallback to base64 encoded certificates
-            cert_base64 = os.environ.get("BETFAIR_CERT_BASE64")
-            key_base64 = os.environ.get("BETFAIR_KEY_BASE64")
+            if env_cert_path and env_key_path and os.path.exists(env_cert_path) and os.path.exists(env_key_path):
+                self._cert_path = env_cert_path
+                self._key_path = env_key_path
+                logger.info(f"Certificate loaded from environment paths: {env_cert_path}")
+            else:
+                # Fallback to base64 encoded certificates
+                cert_base64 = os.environ.get("BETFAIR_CERT_BASE64")
+                key_base64 = os.environ.get("BETFAIR_KEY_BASE64")
 
-            if cert_base64 and key_base64:
-                try:
-                    cert_data = base64.b64decode(cert_base64)
-                    key_data = base64.b64decode(key_base64)
+                if cert_base64 and key_base64:
+                    try:
+                        cert_data = base64.b64decode(cert_base64)
+                        key_data = base64.b64decode(key_base64)
 
-                    cert_file = tempfile.NamedTemporaryFile(mode='wb', suffix='.crt', delete=False)
-                    cert_file.write(cert_data)
-                    cert_file.close()
-                    self._temp_cert_file = cert_file.name
-                    self._cert_path = cert_file.name
+                        cert_file = tempfile.NamedTemporaryFile(mode='wb', suffix='.crt', delete=False)
+                        cert_file.write(cert_data)
+                        cert_file.close()
+                        self._temp_cert_file = cert_file.name
+                        self._cert_path = cert_file.name
 
-                    key_file = tempfile.NamedTemporaryFile(mode='wb', suffix='.key', delete=False)
-                    key_file.write(key_data)
-                    key_file.close()
-                    self._temp_key_file = key_file.name
-                    self._key_path = key_file.name
+                        key_file = tempfile.NamedTemporaryFile(mode='wb', suffix='.key', delete=False)
+                        key_file.write(key_data)
+                        key_file.close()
+                        self._temp_key_file = key_file.name
+                        self._key_path = key_file.name
 
-                    logger.info("Certificate loaded from base64 environment variables")
-                except Exception as e:
-                    logger.error(f"Failed to load certificates from env: {e}")
+                        logger.info("Certificate loaded from base64 environment variables")
+                    except Exception as e:
+                        logger.error(f"Failed to load certificates from env: {e}")
 
         return True
 
