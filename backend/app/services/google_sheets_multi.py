@@ -428,8 +428,9 @@ class GoogleSheetsMultiService:
 
             scheduled = []
             for match in matches:
-                status = str(match.get("Status", "")).strip()
-                if not status or status == "":
+                status = str(match.get("Status", "")).strip().upper()
+                # Include matches with PROGRAMAT status or no status
+                if not status or status == "" or status == "PROGRAMAT":
                     scheduled.append({
                         "Meci": match.get("Meci", ""),
                         "Data": match.get("Data", ""),
