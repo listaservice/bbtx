@@ -49,7 +49,8 @@ class BetfairClient:
         username: str,
         password: str,
         cert_path: Optional[str] = None,
-        key_path: Optional[str] = None
+        key_path: Optional[str] = None,
+        use_env_fallback: bool = True
     ) -> bool:
         """
         Configurează clientul Betfair.
@@ -70,9 +71,9 @@ class BetfairClient:
         self._cert_path = cert_path
         self._key_path = key_path
 
-        # Only use environment variables if NO certificate was provided by user
-        # This allows user-specific authentication (with or without cert)
-        if cert_path is None and key_path is None:
+        # Only use environment variables if explicitly allowed (for auto-configure at startup)
+        # For user-specific authentication, use_env_fallback should be False
+        if use_env_fallback and cert_path is None and key_path is None:
             # Check for certificate paths in environment
             env_cert_path = os.environ.get("BETFAIR_CERT_PATH")
             env_key_path = os.environ.get("BETFAIR_KEY_PATH")

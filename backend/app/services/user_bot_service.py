@@ -74,12 +74,14 @@ class UserBotService:
                     key_path = None
 
             # Configure Betfair client with or without certificate
+            # IMPORTANT: use_env_fallback=False to prevent master certificate from being used
             self.betfair_client.configure(
                 app_key=credentials['app_key'],
                 username=credentials['username'],
                 password=credentials['password'],
                 cert_path=cert_path,
-                key_path=key_path
+                key_path=key_path,
+                use_env_fallback=False  # Never use env vars for user-specific auth
             )
 
             # 3. Connect to Betfair
