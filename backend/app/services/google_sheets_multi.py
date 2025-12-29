@@ -374,8 +374,14 @@ class GoogleSheetsMultiService:
                     continue
 
                 try:
-                    team_sheet = spreadsheet.worksheet(t_name)
-                    matches = team_sheet.get_all_records()
+                    # Cache team sheet reads to avoid rate limits
+                    team_cache_key = f"team_sheet_{spreadsheet_id}_{t_name}"
+                    matches = self._get_cached(team_cache_key)
+
+                    if matches is None:
+                        team_sheet = spreadsheet.worksheet(t_name)
+                        matches = team_sheet.get_all_records()
+                        self._set_cached(team_cache_key, matches)
 
                     for match in matches:
                         status = str(match.get("Status", "")).strip().upper()
