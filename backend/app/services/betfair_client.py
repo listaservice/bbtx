@@ -17,14 +17,15 @@ class BetfairClient:
     Gestionează autentificarea, căutarea meciurilor și plasarea pariurilor.
     """
 
-    # Use .ro endpoint for login (required for Romanian accounts)
-    IDENTITY_URL = "https://identitysso-cert.betfair.ro/api/certlogin"
+    # Authentication endpoints
+    IDENTITY_URL_CERT = "https://identitysso-cert.betfair.ro/api/certlogin"  # With SSL certificate
+    IDENTITY_URL_STANDARD = "https://identitysso.betfair.ro/api/login"  # Without certificate (Delayed App Key)
 
     # Use global API endpoint (works for all accounts)
     API_URL = "https://api.betfair.com/exchange/betting/rest/v1.0"
 
     # Fallback endpoints
-    IDENTITY_URL_GLOBAL = "https://identitysso-cert.betfair.com/api/certlogin"
+    IDENTITY_URL_CERT_GLOBAL = "https://identitysso-cert.betfair.com/api/certlogin"
     API_URL_RO = "https://api.betfair.ro/exchange/betting/rest/v1.0"
 
     FOOTBALL_EVENT_TYPE_ID = "1"
@@ -108,6 +109,9 @@ class BetfairClient:
     async def connect(self) -> bool:
         """
         Autentifică la Betfair API.
+        Suportă 2 metode:
+        1. Non-Interactive (certlogin) - cu certificat SSL
+        2. Interactive API (login) - fără certificat, doar username+password+App Key
 
         Returns:
             True dacă autentificarea a reușit
@@ -117,14 +121,34 @@ class BetfairClient:
             return False
 
         try:
-            cert = None
-            if self._cert_path and self._key_path:
+            # Determine authentication method based on certificate availability
+            has_certificate = bool(self._cert_path and self._key_path)
+
+            if has_certificate:
+                # Method 1: Non-Interactive Login with SSL Certificate
+                identity_url = self.IDENTITY_URL_CERT
                 cert = (self._cert_path, self._key_path)
+                logger.info(f"Using certificate authentication for {self._username}")
+            else:
+                # Method 2: Interactive API Login (no certificate needed)
+                identity_url = self.IDENTITY_URL_STANDARD
+                cert = None
+                logger.info(f"Using standard authentication (no certificate) for {self._username}")
 
             async with httpx.AsyncClient(cert=cert, timeout=30.0) as client:
+                # Prepare headers
+                headers = {
+                    "X-Application": self._app_key,
+                    "Accept": "application/json"
+                }
+
+                if not has_certificate:
+                    # Standard login requires Content-Type header
+                    headers["Content-Type"] = "application/x-www-form-urlencoded"
+
                 response = await client.post(
-                    self.IDENTITY_URL,
-                    headers={"X-Application": self._app_key},
+                    identity_url,
+                    headers=headers,
                     data={
                         "username": self._username,
                         "password": self._password
@@ -133,14 +157,27 @@ class BetfairClient:
 
                 result = response.json()
 
-                if result.get("loginStatus") == "SUCCESS":
-                    self._session_token = result.get("sessionToken")
-                    self._connected = True
-                    logger.info("Autentificat la Betfair API")
-                    return True
+                # Handle response based on authentication method
+                if has_certificate:
+                    # Certificate login response format
+                    if result.get("loginStatus") == "SUCCESS":
+                        self._session_token = result.get("sessionToken")
+                        self._connected = True
+                        logger.info(f"✅ Authenticated with certificate for {self._username}")
+                        return True
+                    else:
+                        logger.error(f"Certificate auth failed: {result.get('loginStatus')}")
+                        return False
                 else:
-                    logger.error(f"Autentificare eșuată: {result.get('loginStatus')}")
-                    return False
+                    # Standard login response format
+                    if result.get("status") == "SUCCESS":
+                        self._session_token = result.get("token")
+                        self._connected = True
+                        logger.info(f"✅ Authenticated without certificate for {self._username}")
+                        return True
+                    else:
+                        logger.error(f"Standard auth failed: {result.get('status')} - {result.get('error')}")
+                        return False
 
         except Exception as e:
             logger.error(f"Eroare la autentificarea Betfair: {e}")

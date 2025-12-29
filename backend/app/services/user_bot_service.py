@@ -47,10 +47,39 @@ class UserBotService:
 
             # 2. Initialize Betfair client
             self.betfair_client = BetfairClient()
+
+            # Prepare certificate paths if user has SSL certificate
+            cert_path = None
+            key_path = None
+
+            if credentials.get('cert_content') and credentials.get('key_content'):
+                # User has SSL certificate - create temporary files
+                import tempfile
+                try:
+                    # Create temp files for certificate
+                    cert_file = tempfile.NamedTemporaryFile(mode='w', suffix='.crt', delete=False)
+                    cert_file.write(credentials['cert_content'])
+                    cert_file.close()
+                    cert_path = cert_file.name
+
+                    key_file = tempfile.NamedTemporaryFile(mode='w', suffix='.key', delete=False)
+                    key_file.write(credentials['key_content'])
+                    key_file.close()
+                    key_path = key_file.name
+
+                    logger.info(f"Created temporary certificate files for user {self.user.email}")
+                except Exception as e:
+                    logger.error(f"Failed to create temp certificate files: {e}")
+                    cert_path = None
+                    key_path = None
+
+            # Configure Betfair client with or without certificate
             self.betfair_client.configure(
                 app_key=credentials['app_key'],
                 username=credentials['username'],
-                password=credentials['password']
+                password=credentials['password'],
+                cert_path=cert_path,
+                key_path=key_path
             )
 
             # 3. Connect to Betfair
@@ -78,7 +107,8 @@ class UserBotService:
         """Load și decrypt Betfair credentials pentru acest user"""
         with self.engine.connect() as conn:
             result = conn.execute(text("""
-                SELECT username_encrypted, password_encrypted, app_key_encrypted
+                SELECT username_encrypted, password_encrypted, app_key_encrypted,
+                       cert_encrypted, key_encrypted
                 FROM betfair_credentials
                 WHERE user_id = :user_id
             """), {"user_id": self.user_id})
@@ -88,11 +118,24 @@ class UserBotService:
                 return None
 
             try:
-                return {
+                credentials = {
                     'username': encryption_service.decrypt(row.username_encrypted),
                     'password': encryption_service.decrypt(row.password_encrypted),
-                    'app_key': encryption_service.decrypt(row.app_key_encrypted)
+                    'app_key': encryption_service.decrypt(row.app_key_encrypted),
+                    'cert_content': None,
+                    'key_content': None
                 }
+
+                # Load certificate if exists
+                if row.cert_encrypted and row.key_encrypted:
+                    try:
+                        credentials['cert_content'] = encryption_service.decrypt(row.cert_encrypted)
+                        credentials['key_content'] = encryption_service.decrypt(row.key_encrypted)
+                        logger.info(f"Loaded SSL certificate for user {self.user.email}")
+                    except Exception as cert_error:
+                        logger.warning(f"Could not decrypt certificate for user {self.user.email}: {cert_error}")
+
+                return credentials
             except Exception as e:
                 logger.error(f"Failed to decrypt credentials for user {self.user.email}: {e}")
                 return None
