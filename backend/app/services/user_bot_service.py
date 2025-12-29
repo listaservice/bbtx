@@ -10,7 +10,7 @@ from app.models.schemas import Team, TeamStatus, TeamUpdate
 from app.models.user import User
 from app.services.teams_repository import teams_repository
 from app.services.betfair_client import BetfairClient
-from app.services.google_sheets_multi import GoogleSheetsMultiService
+from app.services.google_sheets_multi import google_sheets_multi_service
 from app.services.encryption import encryption_service
 from sqlalchemy import create_engine, text
 from app.config import get_settings
@@ -90,9 +90,9 @@ class UserBotService:
                 logger.error(f"Failed to connect to Betfair for user {self.user.email}")
                 return False
 
-            # 4. Initialize Google Sheets
+            # 4. Initialize Google Sheets (use singleton to preserve cache)
             if self.user.google_sheets_id:
-                self.sheets_client = GoogleSheetsMultiService()
+                self.sheets_client = google_sheets_multi_service
                 self.spreadsheet_id = self.user.google_sheets_id
             else:
                 logger.warning(f"User {self.user.email} nu are Google Sheets ID")
