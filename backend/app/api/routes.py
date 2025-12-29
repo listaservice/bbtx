@@ -522,7 +522,7 @@ async def create_team(
 
                     logger.info(f"Saved {len(matches_sorted)} matches for {team.name} (sorted by date)")
 
-                    # Plasează pariu imediat pe primul meci dacă e azi și nu a început încă
+                    # Plasează pariu imediat pe primul meci (indiferent când e meciul)
                     if matches_sorted and user_betfair_client and user_betfair_client.is_connected():
                         first_match = matches_sorted[0]
                         first_match_time = first_match.get("start_time", "")
@@ -536,9 +536,9 @@ async def create_team(
                                 if match_dt.tzinfo is None:
                                     match_dt = bucharest_tz.localize(match_dt)
 
-                                # Dacă meciul e azi și nu a început încă, plasează pariul
-                                if match_dt.date() == now.date() and match_dt > now:
-                                    logger.info(f"Primul meci {team.name} e azi - plasare pariu imediat")
+                                # Plasează pariu dacă meciul nu a început încă (indiferent de dată)
+                                if match_dt > now:
+                                    logger.info(f"Echipă nouă {team.name} - plasare pariu imediat pe primul meci")
                                     from app.services.user_bot_service import UserBotService
                                     user_bot = UserBotService(current_user)
                                     bet_result = await user_bot.place_bet_for_team(team.name, team.initial_stake)
